@@ -1,8 +1,8 @@
 # Image URL to use all building/pushing image targets
-REGISTRY ?= quay.io
-REPOSITORY ?= $(REGISTRY)/opstree
-IMAGE ?= druid-exporter
-VERSION ?= v0.11
+# REGISTRY ?= quay.io
+# REPOSITORY ?= $(REGISTRY)/opstree
+# IMAGE ?= druid-exporter
+# VERSION ?= v0.11
 
 get-depends:
 	go get -v ./...

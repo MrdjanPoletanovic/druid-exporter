@@ -137,7 +137,8 @@ func DruidHTTPEndpoint(metricsCleanupTTL int, disableHistogram bool, histogram *
 				}
 			}
 
-			logrus.Infof("Successfully collected data from druid emitter, %s", druidData[0]["service"].(string))
+			output_info_service := druidData[0]["service"]
+			logrus.Infof("Successfully collected data from druid emitter, %v", output_info_service)
 		}
 	}
 }

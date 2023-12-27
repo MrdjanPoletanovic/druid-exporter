@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
@@ -182,7 +183,7 @@ func Collector() *MetricCollector {
 		),
 		DruidTasks: prometheus.NewDesc("druid_tasks_duration",
 			"Druid tasks duration and state",
-			[]string{"pod", "datasource", "task_id", "groupd_id", "task_status", "created_time"}, nil,
+			[]string{"pod", "datasource", "task_id", "groupd_id", "task_status", "created_time", "type"}, nil,
 		),
 		DruidSupervisors: prometheus.NewDesc("druid_supervisors",
 			"Druid supervisors status",
@@ -285,8 +286,23 @@ func (collector *MetricCollector) Collect(ch chan<- prometheus.Metric) {
 				hostname = workers[rand.Intn(len(workers))].hostname()
 			}
 		}
-		ch <- prometheus.MustNewConstMetric(collector.DruidTasks,
-			prometheus.GaugeValue, data.Duration, hostname, data.DataSource, data.ID, data.GroupID, data.Status, data.CreatedTime)
+		parsedTime, error := time.Parse(time.RFC3339, data.CreatedTime)
+		loc, _ := time.LoadLocation("UTC")
+		lastHourTime := time.Now().In(loc).Add(-1 * time.Hour)
+
+		logrus.Debugf("Parsed time: %v", parsedTime)
+		logrus.Debugf("Last hour time: %v", lastHourTime)
+
+		// only for debugging purpose
+		if(error != nil) {
+			logrus.Errorf("Error parsing time: %v", error)
+		}
+
+		if error == nil && parsedTime.After(lastHourTime) {
+			logrus.Debugf("Task %v is in latest hour", data.ID)
+			ch <- prometheus.MustNewConstMetric(collector.DruidTasks,
+				prometheus.GaugeValue, data.Duration, hostname, data.DataSource, data.ID, data.GroupID, data.Status, data.CreatedTime, data.Type)
+		}
 	}
 
 	for _, data := range GetDruidData(supervisorURL) {

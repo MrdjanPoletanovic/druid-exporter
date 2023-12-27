@@ -2,7 +2,7 @@ package collector
 
 import (
 	"strings"
-	"time"
+	// "time"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -63,9 +63,9 @@ type SegementInterface []struct {
 			} `json:"_default_tier"`
 		} `json:"tiers"`
 		Segments struct {
-			MaxTime        time.Time `json:"maxTime"`
+			// MaxTime        time.Time `json:"maxTime"`
 			Size           int64     `json:"size"`
-			MinTime        time.Time `json:"minTime"`
+			// MinTime        time.Time `json:"minTime"`
 			Count          int       `json:"count"`
 			ReplicatedSize int64     `json:"replicatedSize"`
 		} `json:"segments"`
